@@ -3,18 +3,18 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import static spark.Spark.*;
 import spark.*;
 
 public class MainServer {
 
     public static void main(String[] args) {
-        port(8080);
-        webSocket("/voice", WebSocketHandler.class);
-        get("/resp", (request, responce) -> getFile(request, responce));
-        init();
+//        port(8080);
+//        webSocket("/voice", WebSocketHandler.class);
+//        get("/resp", (request, responce) -> getFile(request, responce));
+//        init();
+        byte[] data = "<html class='v2' dir='ltr' lang='en-GB' xmlns='http://www.w3.org/1999/xhtml' xmlns:b='http://www.google.com/2005/gml/b' xmlns:data='http://www.google.com/2005/gml/data' ".getBytes();
+        AudioEncode.dataToWav(data);
     }
 
     private static Object getFile(Request request, Response response) {

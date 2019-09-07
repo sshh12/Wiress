@@ -1,10 +1,9 @@
+
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketClose;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketConnect;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.sound.sampled.AudioFileFormat;
 import javax.sound.sampled.AudioFormat;
@@ -15,14 +14,12 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Base64;
-import java.util.logging.Level;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-
 @WebSocket
 public class WebSocketHandler {
-    final static Logger logger = LoggerFactory.getLogger(WebSocketHandler.class);
+
     private AudioFormat format = new AudioFormat(
             AudioFormat.Encoding.ULAW,
             8000,
@@ -38,7 +35,7 @@ public class WebSocketHandler {
 
     @OnWebSocketConnect
     public void connected(Session session) {
-        logger.info("Media WS: Connection Accepted");
+        System.out.println("CONNECTED");
     }
 
     @OnWebSocketMessage
@@ -48,11 +45,11 @@ public class WebSocketHandler {
             String event = jo.getString("event");
 
             if (event.equals("connected")) {
-                logger.info("Media WS: Connected message received: {}", message);
+                System.out.println("CONNECTED" + message);
             }
             if (event.equals("start")) {
-                logger.info("Media WS: Start message received: {}", message);
-            
+                System.out.println("STARTED" + message);
+
                 if (ulawFile == null) {
                     callSid = jo.getJSONObject("start").getString("callSid");
                     ulawFile = new File(callSid + ".ulaw");
@@ -67,12 +64,9 @@ public class WebSocketHandler {
 
             }
         } catch (JSONException e) {
-            logger.error("Unrecognized JSON: {}", e);
         } catch (IOException ex) {
-            java.util.logging.Logger.getLogger(WebSocketHandler.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-
 
     @OnWebSocketClose
     public void closed(Session session, int statusCode, String reason) {
@@ -98,7 +92,6 @@ public class WebSocketHandler {
             ulawFile = null;
             uLawFOS = null;
         } catch (Exception ex) {
-            logger.error("Exception in closing: {}", ex);
         }
     }
 }
