@@ -18,58 +18,16 @@ public class AudioEncode {
     static void dataToWav(byte[] data, String filename) {
         try {
 
-            int samplesPerNote = (int) sampleRate / 16;
-            samplesPerNote = 1024;
-            double seconds = data.length * 8 * samplesPerNote / sampleRate;
+            int samplesPerNote = (int) sampleRate / 8;
+            double seconds = data.length * samplesPerNote / sampleRate;
 
             float[] buffer = new float[(int) (seconds * sampleRate)];
 
-            for (int i = 0; i < data.length * 8; i += 8) {
-                byte b = data[i / 8];
-                if((b & 1) != 0) {
-                    for (int sample = (i + 1) * samplesPerNote; sample < (i + 2) * samplesPerNote; sample++) {
-                        buffer[sample] = (float) (
-                                Math.sin(2 * Math.PI * sample * 2000 / sampleRate) +
-                                Math.sin(2 * Math.PI * sample * 1000 / sampleRate) + 
-                                Math.sin(2 * Math.PI * sample * 1500 / sampleRate)
-                        );
-                    }
-                }
-                if((b & 2) != 0) {
-                    for (int sample = (i + 2) * samplesPerNote; sample < (i + 3) * samplesPerNote; sample++) {
-                        buffer[sample] = (float) (
-                                Math.sin(2 * Math.PI * sample * 2000 / sampleRate) +
-                                Math.sin(2 * Math.PI * sample * 1000 / sampleRate) + 
-                                Math.sin(2 * Math.PI * sample * 1500 / sampleRate)
-                        );
-                    }
-                }
-                if((b & 4) != 0) {
-                    for (int sample = (i + 3) * samplesPerNote; sample < (i + 4) * samplesPerNote; sample++) {
-                        buffer[sample] = (float) (
-                                Math.sin(2 * Math.PI * sample * 2000 / sampleRate) +
-                                Math.sin(2 * Math.PI * sample * 1000 / sampleRate) + 
-                                Math.sin(2 * Math.PI * sample * 1500 / sampleRate)
-                        );
-                    }
-                }
-                if((b & 8) != 0) {
-                    for (int sample = (i + 4) * samplesPerNote; sample < (i + 5) * samplesPerNote; sample++) {
-                        buffer[sample] = (float) (
-                                Math.sin(2 * Math.PI * sample * 2000 / sampleRate) +
-                                Math.sin(2 * Math.PI * sample * 1000 / sampleRate) + 
-                                Math.sin(2 * Math.PI * sample * 1500 / sampleRate)
-                        );
-                    }
-                }
-                if((b & 16) != 0) {
-                    for (int sample = (i + 5) * samplesPerNote; sample < (i + 6) * samplesPerNote; sample++) {
-                        buffer[sample] = (float) (
-                                Math.sin(2 * Math.PI * sample * 2000 / sampleRate) +
-                                Math.sin(2 * Math.PI * sample * 1000 / sampleRate) + 
-                                Math.sin(2 * Math.PI * sample * 1500 / sampleRate)
-                        );
-                    }
+            for (int i = 0; i < data.length; i++) {
+                byte b = data[i];
+                float freq = byteToFreq(b);
+                for (int sample = i * samplesPerNote; sample < (i + 1) * samplesPerNote; sample++) {
+                    buffer[sample] = (float) (Math.sin(2 * Math.PI * sample * freq / sampleRate));
                 }
             }
 
@@ -125,31 +83,26 @@ public class AudioEncode {
 
     static byte dataFromSpec(FFT fft) {
         float[] spectrum = fft.getSpectrum();
-//        int best = -1;
-//        float bestScore = -1;
-//        int minIndex = fft.freqToIndex(byteToFreq((byte)0));
-//        int maxIndex = fft.freqToIndex(byteToFreq((byte)127));
-//        for (int i = minIndex; i <= maxIndex; i++) {
-//            float freq = fft.indexToFreq(i);
-//            int nextIndex = fft.freqToIndex(freq + 500);
-//            float score = spectrum[i] * 5 + spectrum[nextIndex];
-//            if (score > bestScore) {
-//                bestScore = score;
-//                best = i;
-//            }
-//        }
-//        float freq = fft.indexToFreq(best);
-        int tIndex = fft.freqToIndex(2000);
-        if(spectrum[tIndex] > 0.1) {
-            return 1;
+        int best = -1;
+        float bestScore = -1;
+        int minIndex = fft.freqToIndex(byteToFreq((byte)0));
+        int maxIndex = fft.freqToIndex(byteToFreq((byte)127));
+        for (int i = minIndex; i <= maxIndex; i++) {
+            float freq = fft.indexToFreq(i);
+            float score = spectrum[i];
+            if (score > bestScore) {
+                bestScore = score;
+                best = i;
+            }
         }
-        return 0;
+        float freq = fft.indexToFreq(best);
+        return freqToByte(freq);
     }
 
     static float byteToFreq(byte b) {
         return b * 100 + 400;
     }
-    
+
     static byte freqToByte(float freq) {
         return (byte) ((freq - 400) / 100 + 0.5);
     }

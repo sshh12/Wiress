@@ -22,8 +22,11 @@ public class MainServer {
             + "</Response>";
 
     public static void main(String[] args) {
-        // runServer();
-        byte[] data = "UU<html class='v2' dir='ltr' lang='en-GB' xmlns='http://www.w3.org/1999/xhtml' xmlns:b='http://www.google.com/2005/gml/b' xmlns:data='http://www.google.com/2005/gml/data' ".getBytes();
+        runServer();
+    }
+
+    public static void testDecoding() {
+        byte[] data = "<html class='v2' dir='ltr' lang='en-GB' xmlns='http://www.w3.org/1999/xhtml' xmlns:b='http://www.google.com/2005/gml/b' xmlns:data='http://www.google.com/2005/gml/data' ".getBytes();
         AudioEncode.dataToWav(data, "out.wav");
         byte[] dat = AudioEncode.wavToBytes("out.wav");
         System.out.println(new String(dat));
