@@ -5,6 +5,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import javax.sound.sampled.AudioFileFormat;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
@@ -51,27 +52,39 @@ public class AudioEncode {
         }
     }
 
-    static void wavToBytes(String filename) {
+    static byte[] wavToBytes(String filename) {
         try {
             WaveDecoder decoder = new WaveDecoder( new FileInputStream(filename) );
 
             float[] samples = new float[1024];
 
             FFT fft = new FFT(1024, 44100);
-            float[] spectrum;
+            
+            ArrayList<Byte> datas = new ArrayList<>();
+            byte last = -1;
 
             while (decoder.readSamples(samples) > 0) {
                 fft.forward(samples);
-                spectrum = fft.getSpectrum();
-                dataFromSpec(spectrum, fft);
+                byte b = dataFromSpec(fft);
+                if(b != last) {
+                    datas.add(b);
+                    last = b;
+                }
             }
-
+            
+            byte[] bytes = new byte[datas.size()];
+            for(int i = 0; i < datas.size(); i++) {
+                bytes[i] = datas.get(i);
+            }
+            return bytes;
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+        return null;
     }
     
-    static void dataFromSpec(float[] spectrum, FFT fft) {
+    static byte dataFromSpec(FFT fft) {
+        float[] spectrum = fft.getSpectrum();
         int best = -1;
         float bestScore = -1;
         for(int i = 0; i < spectrum.length; i++) {
@@ -82,8 +95,9 @@ public class AudioEncode {
         }
         float freq = fft.indexToFreq(best);
         byte data = (byte)((freq - 200) / 50 + 0.5);
-        String test = new String(new byte[]{data});
-        System.out.println(best + " " + (int)((freq - 200) / 50 + 0.5) + "  " + test);
+        //String test = new String(new byte[]{data});
+        //System.out.println(best + " " + (int)((freq - 200) / 50 + 0.5) + "  " + test);
+        return data;
     }
 
 }
