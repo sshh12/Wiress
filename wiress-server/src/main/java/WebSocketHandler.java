@@ -14,6 +14,10 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Base64;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import net.bramp.ffmpeg.*;
+import net.bramp.ffmpeg.builder.FFmpegBuilder;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -84,13 +88,33 @@ public class WebSocketHandler {
             );
             AudioSystem.write(ais, AudioFileFormat.Type.WAVE, wavFOS);
             wavFOS.close();
-
-            // Hmm
             wavFOS = null;
             wavFile = null;
             ulawFile = null;
             uLawFOS = null;
+            convertTwilioAudio(callSid + ".wav");
+            byte[] data = AudioEncode.wavToBytes("fixed" + callSid + ".wav");
+            System.out.println(new String(data));
         } catch (Exception ex) {
         }
     }
+
+    void convertTwilioAudio(String original) {
+        try {
+            FFmpeg ffmpeg = new FFmpeg("C:\\LocalDev\\bin\\ffmpeg.exe");
+            FFprobe ffprobe = new FFprobe("C:\\LocalDev\\bin\\ffprobe.exe");
+            FFmpegBuilder builder = new FFmpegBuilder()
+                    .setInput(original)
+                    .overrideOutputFiles(true)
+                    .addOutput("fixed" + original)
+                    .setFormat("wav")
+                    .setAudioChannels(1)
+                    .setAudioSampleRate(44_100)
+                    .done();
+            FFmpegExecutor executor = new FFmpegExecutor(ffmpeg, ffprobe);
+            executor.createJob(builder).run();
+        } catch (IOException ex) {
+        }
+    }
+
 }

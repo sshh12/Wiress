@@ -72,8 +72,9 @@ public class WaveDecoder implements com.badlogic.audio.io.Decoder
 		if( fmt != 16 )
 			throw new IllegalArgumentException( "Only 16-bit signed format supported" );
 		
-		if( !in.read4ByteString().equals( "data" ) )
-			throw new RuntimeException( "expected data tag" );
+                in.read4ByteString();
+		//if( !in.read4ByteString().equals( "data" ) )
+		//	throw new RuntimeException( "expected data tag" );
 				
 		in.readIntLittleEndian();
 	}

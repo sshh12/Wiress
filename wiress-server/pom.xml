@@ -33,9 +33,9 @@
             <type>jar</type>
         </dependency>
         <dependency>
-            <groupId>com.github.axet</groupId>
-            <artifactId>TarsosDSP</artifactId>
-            <version>2.4-1</version>
+            <groupId>net.bramp.ffmpeg</groupId>
+            <artifactId>ffmpeg</artifactId>
+            <version>0.6.2</version>
         </dependency>
     </dependencies>
     <properties>
