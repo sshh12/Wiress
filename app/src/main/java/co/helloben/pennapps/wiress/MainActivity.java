@@ -1,9 +1,13 @@
 package co.helloben.pennapps.wiress;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.webkit.WebView;
 import android.widget.Button;
@@ -38,8 +42,16 @@ public class MainActivity extends AppCompatActivity {
 
                 statusText.setText(R.string.generating);
 
-                AudioHelpers audioHelpers = new AudioHelpers(getApplicationContext());
+                final AudioHelpers audioHelpers = new AudioHelpers(getApplicationContext());
                 audioHelpers.GenerateWAV(url);
+
+                if (checkCallingOrSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED &&
+                        checkCallingOrSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+                    Log.i("hello", "has audio perm");
+                } else {
+                    requestPermissions(new String[]{Manifest.permission.RECORD_AUDIO, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 101);
+                }
+
 
                 // Play audio max volume
 
@@ -48,18 +60,38 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onCompletion(Object o) {
                         statusText.setText(R.string.listening);
+
+                        // Start listening for audio from mic
+                        audioHelpers.RecordWAVFromMic(new BensBadCallbackInterface() {
+                            @Override
+                            public void onCompletion(Object o) {
+                                statusText.setText(R.string.decoding);
+
+                                // Decode audio recording
+                                String html = audioHelpers.DecodeRecordedWAV();
+                                statusText.setText(R.string.displaying + url);
+                                thisWebView.loadData(html, "text/html", null);
+                            }
+                        });
                     }
                 });
 
-                // Start listening for audio from mic
 
 
-                // Decode audio recording
+
+
 
 
 
             }
         });
+    }
+
+    @Override
+    public void onBackPressed() {
+
+        moveTaskToBack(true);
+        // todo: CANCEL THINGS
     }
 
 
