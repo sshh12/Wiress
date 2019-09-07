@@ -13,8 +13,9 @@ public class MainServer {
 //        webSocket("/voice", WebSocketHandler.class);
 //        get("/resp", (request, responce) -> getFile(request, responce));
 //        init();
-        byte[] data = "<html class='v2' dir='ltr' lang='en-GB' xmlns='http://www.w3.org/1999/xhtml' xmlns:b='http://www.google.com/2005/gml/b' xmlns:data='http://www.google.com/2005/gml/data' ".getBytes();
-        AudioEncode.dataToWav(data);
+        //byte[] data = "<html class='v2' dir='ltr' lang='en-GB' xmlns='http://www.w3.org/1999/xhtml' xmlns:b='http://www.google.com/2005/gml/b' xmlns:data='http://www.google.com/2005/gml/data' ".getBytes();
+        //AudioEncode.dataToWav(data, "out.wav");
+        AudioEncode.wavToBytes("out.wav");
     }
 
     private static Object getFile(Request request, Response response) {

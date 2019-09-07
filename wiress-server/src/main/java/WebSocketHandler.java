@@ -63,8 +63,7 @@ public class WebSocketHandler {
                 uLawFOS.write(decodedBytes);
 
             }
-        } catch (JSONException e) {
-        } catch (IOException ex) {
+        } catch (Exception e) {
         }
     }
 
