@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Wiress</string>
+    <string name="generating">Generating audiocode</string>
+    <string name="playing">Transmitting audiocode — place remain silent</string>
+    <string name="listening">Listening for audiocode response — pleace remain silent</string>
+    <string name="decoding">Decoding audiocode as HTMLs</string>
+</resources>
